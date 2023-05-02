@@ -1,0 +1,36 @@
+{
+  "name": "koishi-plugin-youpokedme",
+  "description": "A koishi plugin you can poke back to who poked you",
+  "version": "0.0.1-beta",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "homepage": "https://github.com/twiyin0/koishi-plugin-youpokedme.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/twiyin0/koishi-plugin-youpokedme.git"
+  },
+  "contributors": [
+    "Twiyin0 <twiyin0@outlook.com>"
+  ],
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "koishi": {
+    "description": {
+      "en": "A koishi plugin you can poke back to who poked you",
+      "zh": "喂!(#`O′) 戳我干什么!!"
+    }
+  },
+  "license": "MIT",
+  "scripts": {},
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "plugin",
+    "戳一戳"
+  ],
+  "peerDependencies": {
+    "koishi": "^4.12.0"
+  }
+}
