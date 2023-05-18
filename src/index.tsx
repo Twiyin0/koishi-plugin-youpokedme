@@ -4,7 +4,7 @@ import { resolve } from 'path'
 import fs from 'fs'
 import path from 'path'
 
-export const name = 'youpokedme'
+export const name = 'pokedme'
 
 export interface Config {
   text: string[],
@@ -43,7 +43,7 @@ export function apply(ctx: Context, config: Config) {
     let sendcontent;
     // 当戳一戳的目标为bot时触发
     if (session.targetId === session.selfId) {
-      if(Random.bool(config.pokebk? config.pokebk:0.5))
+      if(Random.bool(config.pokebk))
         await session.send(`<onebot:poke qq="${session.userId}"/>`);
       else if (config.text && Random.bool(config.bktxt))
         sendcontent = Random.pick(config.text);
@@ -58,14 +58,14 @@ export function apply(ctx: Context, config: Config) {
         else if(config.audioarr) sendcontent = solvAudio(Random.pick(config.audioarr));
         else {
           var audiofile = config.rdmAudioFolder+Random.pick(solvAudioFolder(config.rdmAudioFolder));
-          sendcontent = <audio url={pathToFileURL(resolve(__dirname, audiofile)).href}/>;
+          sendcontent = <audio url={pathToFileURL(resolve(__dirname, audiofile)).href} />;
         }
       }
       else if ((config.imgarr || config.rdmImgFolder) && Random.bool(config.bkimg)) {
         if(config.imgarr && config.rdmImgFolder) {
           if(Random.bool(0.5)) {
             var imgfile = config.rdmImgFolder+Random.pick(solvImgFolder(config.rdmImgFolder));
-            sendcontent = <audio url={pathToFileURL(resolve(__dirname, imgfile)).href}/>;
+            sendcontent = <image url={pathToFileURL(resolve(__dirname, imgfile)).href}/>;
           }
           else sendcontent = solvImg(Random.pick(config.audioarr));
         }
@@ -74,7 +74,7 @@ export function apply(ctx: Context, config: Config) {
         }
         else {
           var imgfile = config.rdmImgFolder+Random.pick(solvImgFolder(config.rdmImgFolder));
-          sendcontent = <audio url={pathToFileURL(resolve(__dirname, imgfile)).href}/>;
+          sendcontent = <image url={pathToFileURL(resolve(__dirname, imgfile)).href}/>;
         }
       }
       else sendcontent = '呜呜呜';
