@@ -1,8 +1,8 @@
 import { Context, Schema, Random } from 'koishi'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs'
+import path from 'path'
 
 export const name = 'youpokedme'
 
@@ -40,43 +40,48 @@ export function apply(ctx: Context, config: Config) {
       config.bkaudio=0;
       config.bkimg=0;
     }
+    let sendcontent;
     // 当戳一戳的目标为bot时触发
     if (session.targetId === session.selfId) {
       if(Random.bool(config.pokebk? config.pokebk:0.5))
         await session.send(`<onebot:poke qq="${session.userId}"/>`);
-      else if (!config.rdmAudioFolder&&!config.rdmImgFolder) {
-        if(Random.bool(config.bktxt)) {
-          config.bkimg = null;
-          config.bkaudio = null;
-          session.send(Random.pick(config.text));
+      else if (config.text && Random.bool(config.bktxt))
+        sendcontent = Random.pick(config.text);
+      else if ((config.audioarr || config.rdmAudioFolder) && Random.bool(config.bkaudio)) {
+        if (config.audioarr && config.rdmAudioFolder) {
+          if(Random.bool(0.5)) {
+            var audiofile = config.rdmAudioFolder+Random.pick(solvAudioFolder(config.rdmAudioFolder));
+            sendcontent = <audio url={pathToFileURL(resolve(__dirname, audiofile)).href}/>;
+          }
+          else sendcontent = solvAudio(Random.pick(config.audioarr));
         }
-        if(Random.bool(config.bkimg)) {
-          config.bktxt= null;
-          config.bkaudio = null;
-          session.send(solvImg(Random.pick(config.imgarr)));
-        }
-        if(Random.bool(config.bkaudio)) {
-          config.bktxt = null;
-          config.bkimg = null;
-          session.send(solvAudio(Random.pick(config.audioarr)));
-        }
-      }
-      else if(config.rdmImgFolder || config.rdmAudioFolder) {
-        if(Random.bool(config.bkimg)) {
-          config.bkaudio = null;
-          var imgfile = config.rdmImgFolder+Random.pick(solvImgFolder(config.rdmImgFolder));
-          session.send(<image url={pathToFileURL(resolve(__dirname, imgfile)).href}/>);
-        }
-        if(Random.bool(config.bkaudio)) {
-          config.bkimg = null;
+        else if(config.audioarr) sendcontent = solvAudio(Random.pick(config.audioarr));
+        else {
           var audiofile = config.rdmAudioFolder+Random.pick(solvAudioFolder(config.rdmAudioFolder));
-          session.send(<audio url={pathToFileURL(resolve(__dirname, audiofile)).href}/>);
+          sendcontent = <audio url={pathToFileURL(resolve(__dirname, audiofile)).href}/>;
         }
       }
-      else session.send(Random.pick(config.text));
+      else if ((config.imgarr || config.rdmImgFolder) && Random.bool(config.bkimg)) {
+        if(config.imgarr && config.rdmImgFolder) {
+          if(Random.bool(0.5)) {
+            var imgfile = config.rdmImgFolder+Random.pick(solvImgFolder(config.rdmImgFolder));
+            sendcontent = <audio url={pathToFileURL(resolve(__dirname, imgfile)).href}/>;
+          }
+          else sendcontent = solvImg(Random.pick(config.audioarr));
+        }
+        else if(config.imgarr) {
+          sendcontent = solvImg(Random.pick(config.audioarr));
+        }
+        else {
+          var imgfile = config.rdmImgFolder+Random.pick(solvImgFolder(config.rdmImgFolder));
+          sendcontent = <audio url={pathToFileURL(resolve(__dirname, imgfile)).href}/>;
+        }
+      }
+      else sendcontent = '呜呜呜';
+      session.send(sendcontent);
     }
     // 释放变量
-    config.bkimg=config.bktxt=config.bkaudio=null;
+    sendcontent=config.bkimg=config.bktxt=config.bkaudio=null;
   })
 }
 
