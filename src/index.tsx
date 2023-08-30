@@ -1,100 +1,55 @@
-import { Context, Schema, Random } from 'koishi'
+import { Context, Schema, Random,h } from 'koishi'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
 import fs from 'fs'
 import path from 'path'
 
-export const name = 'pokedme'
+export const name = 'youpokedme'
+
+export const usage = `
+reply是必填项，必须填reply配置项才嗯那个正常使用
+使用方法请看[README](https://www.npmjs.com/package/koishi-plugin-youpokedme)
+`
 
 export interface Config {
-  text: string[],
+  reply: string[],
   pokebk: number,
-  bktxt: number,
-  bkimg: number,
-  bkaudio: number,
-  imgarr: string[],
-  audioarr: string[],
   rdmImgFolder: string,
-  rdmAudioFolder: string
+  rdmImgodds: number,
+  rdmAudioFolder: string,
+  rdmAudioodds: number
 }
 
 export const schema = Schema.object({
-  text: Schema.array(String).description("定义自定义回复文本")
-  .default(['喂(#`O′)，戳我干什么','不许戳！','再这样我要叫警察叔叔啦','讨厌没有边界感的人类','你就不能抱抱我吗','再戳我就要戳回去啦']),
-  pokebk: Schema.number().default(0.5).description('戳回去的概率0-1'),
-  bktxt: Schema.number().default(1).description('回复文本的概率0-1,三个的概率之和不能大于1'),
-  bkimg: Schema.number().default(0).description('回复图片的概率0-1,三个的概率之和不能大于1'),
-  bkaudio: Schema.number().default(0).description('回复语音的概率0-1,三个的概率之和不能大于1'),
-  imgarr: Schema.array(String).description("自定义回复图片(http(s)或者文件绝对路径)"),
-  audioarr: Schema.array(String).description("自定义回复音频(http(s)或者文件绝对路径)"),
+  reply: Schema.array(String).description("定义自定义回复").required(),
+  pokebk: Schema.percent().default(0.5).description('戳回去的概率'),
   rdmImgFolder: Schema.string().description('随机文件夹内的图片(绝对路径)'),
-  rdmAudioFolder: Schema.string().description('随机文件夹内的音频(绝对路径)')
+  rdmImgodds: Schema.percent().default(0.5).description('戳回去回复图片的概率'),
+  rdmAudioFolder: Schema.string().description('随机文件夹内的音频(绝对路径)'),
+  rdmAudioodds: Schema.percent().default(0.5).description('戳回去回复音频的概率')
 })
 
 export function apply(ctx: Context, config: Config) {
   // 戳一戳消息监听
   ctx.on('notice/poke',async (session) => {
-    // 防止配置文件错误
-    if (config.bkaudio+config.bkimg+config.bktxt > 1) {
-      config.bktxt=1;
-      config.bkaudio=0;
-      config.bkimg=0;
-    }
-    let sendcontent;
+    let sendcontent:any;
     // 当戳一戳的目标为bot时触发
     if (session.targetId === session.selfId) {
-      if(Random.bool(config.pokebk))
-        await session.send(`<onebot:poke qq="${session.userId}"/>`);
-      else if (config.text && Random.bool(config.bktxt))
-        sendcontent = Random.pick(config.text);
-      else if ((config.audioarr || config.rdmAudioFolder) && Random.bool(config.bkaudio)) {
-        if (config.audioarr && config.rdmAudioFolder) {
-          if(Random.bool(0.5)) {
-            var audiofile = config.rdmAudioFolder+Random.pick(solvAudioFolder(config.rdmAudioFolder));
-            sendcontent = <audio url={pathToFileURL(resolve(__dirname, audiofile)).href}/>;
-          }
-          else sendcontent = solvAudio(Random.pick(config.audioarr));
-        }
-        else if(config.audioarr) sendcontent = solvAudio(Random.pick(config.audioarr));
-        else {
+      if (Random.bool(config.pokebk)) await session.send(`<onebot:poke qq="${session.userId}"/>`);
+      else {
+        if(config.rdmAudioFolder && Random.bool(config.rdmAudioodds)) {
           var audiofile = config.rdmAudioFolder+Random.pick(solvAudioFolder(config.rdmAudioFolder));
-          sendcontent = <audio url={pathToFileURL(resolve(__dirname, audiofile)).href} />;
+          sendcontent = <audio url={pathToFileURL(resolve(__dirname, audiofile)).href}/>;
         }
-      }
-      else if ((config.imgarr || config.rdmImgFolder) && Random.bool(config.bkimg)) {
-        if(config.imgarr && config.rdmImgFolder) {
-          if(Random.bool(0.5)) {
-            var imgfile = config.rdmImgFolder+Random.pick(solvImgFolder(config.rdmImgFolder));
-            sendcontent = <image url={pathToFileURL(resolve(__dirname, imgfile)).href}/>;
-          }
-          else sendcontent = solvImg(Random.pick(config.audioarr));
-        }
-        else if(config.imgarr) {
-          sendcontent = solvImg(Random.pick(config.audioarr));
-        }
-        else {
+        else if(config.rdmImgFolder && Random.bool(config.rdmImgodds)) {
           var imgfile = config.rdmImgFolder+Random.pick(solvImgFolder(config.rdmImgFolder));
           sendcontent = <image url={pathToFileURL(resolve(__dirname, imgfile)).href}/>;
         }
+        else sendcontent = h.unescape(Random.pick(config.reply));
+        session.send(sendcontent);
       }
-      else sendcontent = '呜呜呜';
-      session.send(sendcontent);
     }
-    // 释放变量
-    sendcontent=config.bkimg=config.bktxt=config.bkaudio=null;
   })
-}
-
-function solvImg(pataurl) {
-  var patt = /^https?:\/\/(.*)/g;
-  if(pataurl.match(patt)) return <image url={pataurl}/>
-  else <image url={pathToFileURL(resolve(__dirname, pataurl)).href}/>
-}
-
-function solvAudio(pataurl) {
-  var patt = /^https?:\/\/(.*)/g;
-  if(pataurl.match(patt)) return <audio url={pataurl}/>
-  else return <audio url={pathToFileURL(resolve(__dirname, pataurl)).href}/>
 }
 
 function solvImgFolder(folder) {
