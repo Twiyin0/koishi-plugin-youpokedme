@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-youpokedme",
   "description": "A koishi plugin you can poke back to who poked you",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "homepage": "https://github.com/twiyin0/koishi-plugin-youpokedme.git",

@@ -4,11 +4,10 @@
 
 A koishi plugin you can poke back to who poked you  
 
-
 # 你怎么戳我！！
 喂!(#`O′) 戳我干什么!!  
 回复写一些调皮的东西，并且概率戳回去！！  
-** 仅支持onebot **  
+**仅支持onebot**  
 
 ## 配置
 * reply: 回复的内容，必填项，见[回复内容](#回复内容)一节
@@ -34,23 +33,27 @@ Hello&lt;image url="https://example.com/path/to/image.png"/&gt;
 音频和文本不要复用，不然会导致一系列问题（包括但不限于多条发送，QQ冻结）
 
 ## History
-### v0.0.1
-- * 发布第一个版本试试，应该会有bug的
-### v1.0.0-alpha.1
-- 修改了有概率无法回复
+### v1.1.1
+- 修复了无法扫描gif的问题
+
+### v1.1.0
+- 重构了shi山代码
+- 修复一堆问题
+
+### v1.0.0
+- 没错，只要协议支持，配置没错就能用了,记得装ffmpeg  
+- 完善README
 
 ### v1.0.0-alpha.2
 - 修改了图片发送为audio的问题
 - 需要注意的是路径不要用中文名
 - 当img数组audio数组与imgFolder、audioFolder都有配置的时候，对应各回复几率是0.5
 
-### v1.0.0
-- 没错，只要协议支持，配置没错就能用了,记得装ffmpeg  
-- 完善README
+### v1.0.0-alpha.1
+- 修改了有概率无法回复
 
-### v1.1.0
-- 重构了shi山代码
-- 修复一堆问题
+### v0.0.1
+- * 发布第一个版本试试，应该会有bug的
 
 ## 注意
 ** 仅支持onebot **  

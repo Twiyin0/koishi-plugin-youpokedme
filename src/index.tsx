@@ -55,7 +55,7 @@ export function apply(ctx: Context, config: Config) {
 function solvImgFolder(folder) {
   let imgfilename = readFilenames(folder);
   const filteredArr = imgfilename.filter((filename) => {
-    return /\.(png|jpg|jpeg|ico|svg)$/i.test(filename);
+    return /\.(png|jpg|jpeg|ico|svg|gif|webp)$/i.test(filename);
   });
   return filteredArr;
 }
