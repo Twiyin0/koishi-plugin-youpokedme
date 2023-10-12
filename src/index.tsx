@@ -1,14 +1,18 @@
-import { Context, Schema, Random,h } from 'koishi'
+import { Context, Schema, Random,h,Logger } from 'koishi'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
 import fs from 'fs'
 import path from 'path'
 
 export const name = 'youpokedme'
+const logger = new Logger(name)
 
 export const usage = `
-reply是必填项，必须填reply配置项才嗯那个正常使用
-使用方法请看[README](https://www.npmjs.com/package/koishi-plugin-youpokedme)
+**该插件仅支持onebot支持戳一戳的协议**  
+reply是必填项，必须填reply配置项才能正常使用  
+使用方法请看[README](https://www.npmjs.com/package/koishi-plugin-youpokedme)  
+**注意** 由于go-cqhttp已停止更新，而新的协议暂不支持戳一戳，因此本插件也随之停止更新  
+感谢go-cqhttp的陪伴，也感谢大家的支持。
 `
 
 export interface Config {
@@ -32,9 +36,10 @@ export const schema = Schema.object({
 export function apply(ctx: Context, config: Config) {
   // 戳一戳消息监听
   ctx.on('notice/poke',async (session) => {
+    try {
     let sendcontent:any;
-    // 当戳一戳的目标为bot时触发
-    if (session.targetId === session.selfId) {
+      // 当戳一戳的目标为bot时触发
+      if (session.targetId === session.selfId) {
       if (Random.bool(config.pokebk)) await session.send(`<onebot:poke qq="${session.userId}"/>`);
       else {
         if(config.rdmAudioFolder && Random.bool(config.rdmAudioodds)) {
@@ -48,6 +53,9 @@ export function apply(ctx: Context, config: Config) {
         else sendcontent = h.unescape(Random.pick(config.reply));
         session.send(sendcontent);
       }
+    }
+    } catch (err) {
+      logger.error('戳一戳时发生错误：',err);
     }
   })
 }

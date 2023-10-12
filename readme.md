@@ -33,6 +33,10 @@ Hello&lt;image url="https://example.com/path/to/image.png"/&gt;
 音频和文本不要复用，不然会导致一系列问题（包括但不限于多条发送，QQ冻结）
 
 ## History
+### v1.1.2（后续停止更新）
+由于go-cqhttp已停止更新，而新的协议暂不支持戳一戳，因此本插件也随之停止更新  
+感谢go-cqhttp的陪伴，也感谢大家的支持。
+
 ### v1.1.1
 - 修复了无法扫描gif的问题
 
